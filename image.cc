@@ -136,6 +136,7 @@ bool WriteImage(const string &filename, const Image &an_image) {
 void DrawLine(int x0, int y0, int x1, int y1, int color,
 	      Image *an_image) {  
   if (an_image == nullptr) abort();
+  
 
 #ifdef SWAP
 #undef SWAP

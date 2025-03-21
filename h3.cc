@@ -5,10 +5,12 @@
 #include <cmath>
 #include <iostream>
 #include <string>
+#include <fstream>
 
 using namespace ComputerVisionProjects;
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   if (argc != 4) {
       std::cout << "Usage: " <<
         argv[0] << " {input_binary_image_name} {output_hough_image_name} {output_hough_array_name}" << std::endl;
@@ -28,10 +30,21 @@ int main(int argc, char **argv){
   }
   
   // Accumulator array
-  int rho = sqrt((img.num_rows()*img.num_rows()) + (img.num_columns()*img.num_columns()));
-  int delrho = 1;
-  int deltheta = 180/delrho;
-  int acc[deltheta][rho*2] = {0};
+  float dr = 0.5;
+  float dt = 0.5;
+
+  int T = 180/dt;
+  int R = sqrt((img.num_rows()*img.num_rows()) + (img.num_columns()*img.num_columns()))/dr;
+  int acc[T][R];
+  // Initialization
+  for(int i = 0; i < T; i++) 
+  {
+    for(int k = 0; k < R; k++) 
+    {
+      acc[i][k] = 0;
+    }
+  }
+
   float rhoc = 0;
   int index = 0;
   // x*cos(theta) + y*sin(theta); did not work, I switched the x and y around.
@@ -42,17 +55,17 @@ int main(int argc, char **argv){
     {
       if(img.GetPixel(i,k) > 0) 
       { 
-        for(int h = 0; h < deltheta; h++) 
+        for(int h = 0; h < T; h++) 
         {
           // Degrees
-          float t = h * (M_PI/180);
+          float theta = h * dt * (M_PI/180);
           
           // Finding rho as the point to plot in acc
-          rhoc = i*cos(t) + k*sin(t);
-          index = round(rhoc) + rho;
+          rhoc = i*cos(theta) + k*sin(theta);
+          index = (round(rhoc))/dr;
           
-          // Boundary checkking
-          if(index >= 0 && index < rho*2) 
+          // Boundary checking
+          if(index >= 0 && index < R) 
           {
             acc[h][index]++;
           }
@@ -72,7 +85,8 @@ int main(int argc, char **argv){
   }
 
   // Bounds of accumulator array onto new image
-  img2.AllocateSpaceAndSetSize(deltheta,rho*2);
+  img2.AllocateSpaceAndSetSize(T,R);
+  img2.SetNumberGrayLevels(255);
   for(int i = 0; i < img2.num_rows(); i++) 
   {
     for(int k = 0; k < img2.num_columns(); k++) 
@@ -86,6 +100,19 @@ int main(int argc, char **argv){
     std::cout << "Can't write to file " << output_txt_filenm << std::endl;
     return 0;
   }
+
+  std::ofstream file(output_txt_filenm);
+  file<<T<<std::endl;
+  file<<R<<std::endl;
+  for (int x = 0; x < T ; x++)
+  {
+    for (int y = 0; y < R; y++)
+    {
+      file << acc[x][y] << " ";
+    }
+    file<<std::endl;
+  }
+  file.close();
   
   return 0;
 }

@@ -7,7 +7,8 @@
 #include <cmath>
 using namespace ComputerVisionProjects;
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   if (argc != 3) {
     std::cout << "Usage: " <<
       argv[0] << " {input_image_name} {output_edge_image_name}" << std::endl;

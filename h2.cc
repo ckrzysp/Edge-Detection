@@ -7,7 +7,8 @@
 
 using namespace ComputerVisionProjects;
 
-int main(int argc, char **argv){
+int main(int argc, char **argv)
+{
   if (argc != 4) {
     std::cout << "Usage: " <<
       argv[0] << " {input_image_name} {threshold} {output_image_name}" << std::endl;
